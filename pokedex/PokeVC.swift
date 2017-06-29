@@ -34,6 +34,9 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
     //counts amount of times musicPlayerBtn has been pressed
     var musicCount = 0
     
+    
+   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -41,6 +44,19 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
         pokeCollectionView.delegate = self
         pokeCollectionView.dataSource = self
         searchBar.delegate = self
+        
+        
+        //recognize taps on the view screen
+        let tap : UITapGestureRecognizer
+        
+        //target is name of Viewcontroller; action is function to call
+        tap = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        
+        
+        
+        //this must be false to stop interference with didselectitemAt cell delegate method
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
         
         playMusic()
         
@@ -53,6 +69,15 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
         
         parsePokemonCSV()
         
+        
+        //change return key type of search bar Uncomment next line to use
+        //searchBar.returnKeyType = UIReturnKeyType.done
+    }
+    
+    //close keyboard after clicking outside of search bar
+    func dismissKeyboard()
+    {
+        view.endEditing(true)
     }
 
     
@@ -146,7 +171,6 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell
     {
         
-        
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PokeCell", for: indexPath) as? PokeCell
         {
             //if no search string is entered
@@ -197,8 +221,31 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
     //controls when a cell is selected behavior
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath)
     {
+        /* when cell is clicked push data to secondVC
+        */
+     
+        //stores individual pokemon data for transfer to next VC
+        var pokeData: Pokemon?
+        
+        if (searchFlag == true)
+        {
+            
+            pokeData = filteredPokemonData[indexPath.row]
+            
+        }
+        
+        else
+        {
+            pokeData = pokemonCollectionViewCellArr[indexPath.row]
+        }
+        
+        performSegue(withIdentifier: "PokeInfoVC", sender: pokeData)
+        musicPlayer?.pause()
+        
         
     }
+    
+
     
     //controls size of each cell; play with settings to get desired amount of cells per row
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
@@ -206,13 +253,25 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
         return CGSize(width: 105, height: 105)
     }
     
+    //when searchbarbutton is clicked response
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        //closes search view
+        view.endEditing(true)
+    }
+    
+    
+    
     //called when search text changes
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String)
     {
+        //searchBar.text appears to be interchangeable with searchText
         if (searchBar.text == nil || searchBar.text == "")
         {
             //do nothing; use default array
             searchFlag = false
+            
+            //closes search view
+            view.endEditing(true)
         }
         
         else
@@ -233,6 +292,28 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
         pokeCollectionView.reloadData()
     }
     
+    //actually does the transferring of the data to secondVC this is just memorized code blocks
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+      
+        if (segue.identifier == "PokeInfoVC")
+        {
+            //sets destination VC to pokeInfoVC
+            if let dest = segue.destination as? PokeInfoVC
+            {
+                //send data of type pokemon
+                if let selectedPokemon = sender as? Pokemon
+                {
+                    //go into destination vc and select field and set it to sent data
+                    dest.chosenPokemon = selectedPokemon
+                }
+            }
+            
+        }
+        
+        
+    }
+    
+ 
     
 
 
