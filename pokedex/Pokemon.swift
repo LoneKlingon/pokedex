@@ -4,11 +4,10 @@
 //
 //  Created by Anthony Youbi Sobodker on 2017-06-23.
 //  Copyright © 2017 SBS. All rights reserved.
-//
+//ßœ
 
 import UIKit
 import Alamofire
-
 
 class Pokemon
 {
@@ -22,8 +21,8 @@ class Pokemon
     var _defense:String!
     var _info:String!
     var _evolutionID:String!
-    var _evolutionName:String?
-    var _evolutionLvl:Int?
+    var _evolutionName:String!
+    var _evolutionLvl:Int!
 
 
     
@@ -231,10 +230,54 @@ class Pokemon
                         //only show pokemon who evolve through leveling
                         if (method == "level_up")
                         {
+                            
                             var nextEvolution = (evolutionsDict?[0]["to"])!
                             
                             self._evolutionName = String(describing: nextEvolution)
                             print("Evolves to: " + self._evolutionName!)
+                            
+                            //required double unwrap to get rid of optional this time try single first and if that doesn't work use double
+                            var level = (evolutionsDict?[0]["level"])!!
+                            
+                            self._evolutionLvl = level as! Int
+                            
+                            //must unwrap before using to remove optional value
+                            print ("Evolution: " + String(describing: self._evolutionLvl!))
+                            
+                            
+                            //stores the api url path to the evolution pokemon
+                            var evolutionPath = (evolutionsDict?[0]["resource_uri"])!
+                            
+                            var evoURL = BASE_URL + String(describing: evolutionPath)
+                            
+                            //get evolution pokemon you can chain multiple json requests inside of each other just make sure to add completion to each one and give a little extra time for requests to finish
+                            Alamofire.request(evoURL).responseJSON
+                            {
+                                response in
+                                let result2 = response.result
+                                print("Result2 status: " + String(describing: result2))
+                                
+                                //stores evolution pokemon information
+                                var evoDict = result2.value as? Dictionary<String, AnyObject>
+                                
+                                for (key, value) in evoDict!
+                                {
+                                    if (key == "national_id")
+                                    {
+                                        //try to convert anyobject to string when possible makes output code much simpler and like before do not use as? string syntax it is prone to error
+                                        self._evolutionID = String(describing: value)
+                                        print ("evolution Id: " + self._evolutionID)
+                                    }
+                                    
+                                }
+                                
+                                
+                             
+                                completed()
+
+                            }
+                            
+                            
                         }
                         
                         else
@@ -257,6 +300,45 @@ class Pokemon
                     }
                    
                    
+                    
+                    
+                }
+                
+                if (key == "descriptions")
+                {
+                    var infoDict = value as? [Dictionary<String, AnyObject>]
+                    
+                    //info api url path
+                    var infoPath = (infoDict?[0]["resource_uri"])!
+                    
+                    var infoURL = BASE_URL + String(describing: infoPath)
+                    
+                    print("info url: " + infoURL)
+                    
+                    //JSON REQUEST TIME
+                    Alamofire.request(infoURL).responseJSON
+                    {
+                        response in
+                        let result3 = response.result
+                        
+                        print("result3: " + String(describing: result3))
+                        
+                        var infoDict = result3.value as? Dictionary<String, AnyObject>
+                        
+                        for (key, value) in infoDict!
+                        {
+                            if (key == "description")
+                            {
+                                self._info = String(describing: value)
+                                print("Info: " + self._info)
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                    
+                    
                     
                     
                 }
