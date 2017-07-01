@@ -115,6 +115,7 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
         
         do
         {
+            
             //initializing musicPlayer class object with path of music file
             musicPlayer = try AVAudioPlayer(contentsOf: URL(string: path!)!)
             musicPlayer?.prepareToPlay()
@@ -240,7 +241,7 @@ class PokeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSo
         }
         
         performSegue(withIdentifier: "PokeInfoVC", sender: pokeData)
-        musicPlayer?.pause()
+        //musicPlayer?.pause()
         
         
     }

@@ -119,7 +119,7 @@ class Pokemon
     {
         if (_evolutionLvl == nil)
         {
-            _evolutionLvl = 0
+            _evolutionLvl = -1
         }
         
         return _evolutionLvl!
@@ -240,10 +240,11 @@ class Pokemon
                             var level = (evolutionsDict?[0]["level"])!!
                             
                             self._evolutionLvl = level as! Int
+                        
                             
                             //must unwrap before using to remove optional value
                             print ("Evolution: " + String(describing: self._evolutionLvl!))
-                            
+                    
                             
                             //stores the api url path to the evolution pokemon
                             var evolutionPath = (evolutionsDict?[0]["resource_uri"])!
@@ -334,6 +335,8 @@ class Pokemon
                             }
                             
                         }
+                        //always remember this at the end!
+                        completed()
                         
                     }
                     

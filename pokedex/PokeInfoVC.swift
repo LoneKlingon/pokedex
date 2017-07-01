@@ -43,6 +43,36 @@ class PokeInfoVC: UIViewController {
     @IBAction func backBtnPressed(_ sender: Any)
     {
         //put code to handle when back button is pressed; will keep music player paused at exact point when pressed 
+        dismiss(animated: true, completion: nil)
+        
+    }
+    
+    //update the ui with correct info
+    func updateUI()
+    {
+        self.pokeNameLbl.text = self.chosenPokemon.name.capitalized
+        self.pokemonDexIdLbl.text = self.chosenPokemon.pokeId
+        self.pokemonTypeLbl.text = self.chosenPokemon.type
+        self.pokemonAttackLbl.text = self.chosenPokemon.attack
+        self.pokemonDefenseLbl.text = self.chosenPokemon.defense
+        self.pokemonHeightLbl.text = self.chosenPokemon.height
+        self.pokemonWeightLbl.text = self.chosenPokemon.weight
+        self.pokemonDescriptionLbl.text = self.chosenPokemon.info
+        self.pokemonImage1.image = UIImage(named: self.chosenPokemon.pokeId)
+        self.pokemonImage2.image = UIImage(named: self.chosenPokemon.pokeId)
+        self.pokemonEvolutionImage.image = UIImage(named: self.chosenPokemon.evolutionID)
+        
+        if (self.chosenPokemon.evolutionLvl == -1)
+        {
+            self.pokemonEvolutionLbl.text = "No Evolution"
+            
+        }
+        
+        else
+        {
+            self.pokemonEvolutionLbl.text = "Evolves to " + self.chosenPokemon.evolutionName + " at Level " + String(describing: self.chosenPokemon.evolutionLvl)
+        }
+        
         
     }
     
@@ -53,14 +83,21 @@ class PokeInfoVC: UIViewController {
 
         // Do any additional setup after loading the view.
         
-        pokeNameLbl.text = chosenPokemon.name.capitalized
+        pokemonImage1.image = UIImage(named: chosenPokemon.pokeId)
         
-        //run the download function
+        //all the runtime code should go here
         chosenPokemon.downloadPokemonData
         {
-            //run updating code here 
             
+                self.updateUI()
+                
+                
+                
         }
+        
+        
+        
+      
     }
 
     override func didReceiveMemoryWarning() {
